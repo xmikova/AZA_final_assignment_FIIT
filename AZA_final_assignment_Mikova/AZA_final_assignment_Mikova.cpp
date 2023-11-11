@@ -1,50 +1,87 @@
 ﻿#include <iostream>
 #include <vector>
+#include <algorithm>
 
-void schedule(int n, const std::vector<int>& deadline, std::vector<int>& J) {
-    J.clear();
-    J.push_back(1);
+class Job {
+public:
+    int deadline;
+    int profit;
+    int index;
 
-    for (int i = 2; i <= n; i++) {
-        std::vector<int> K = J;
-        int j = 0;
-        while (j < K.size() && deadline[i] < deadline[K[j]])
-            j++;
+    Job(int d, int p, int i) : deadline(d), profit(p), index(i) {}
+};
 
-        K.insert(K.begin() + j, i);
+bool isFeasible(const std::vector<int>& schedule, const std::vector<Job>& jobs) {
+    std::vector<int> jobScheduled(jobs.size(), 0);
+    int currentTime = 0;
 
-        if (isFeasible(K, deadline)) {
-            J = K;
+    for (int i : schedule) {
+        const Job& job = jobs[i - 1];
+        if (jobScheduled[i - 1] == 0) {
+            jobScheduled[i - 1] = 1;
+            currentTime += job.profit;
+
+            if (currentTime > job.deadline) {
+                return false;
+            }
+        }
+        else {
+            return false;
         }
     }
+
+    return true;
 }
 
-int main()
-{
-    int n = 5;
-    std::vector<int> deadline = { 2, 4, 3, 2, 3, 1, 1 };
-    std::vector<int> profit = { 40, 15, 15, 20, 10, 45, 55 };
+std::vector<int> schedule(int n, std::vector<Job>& jobs) {
     std::vector<int> J;
-    std::vector<int> sortedDeadline;
 
+    for (int i = 2; i <= n; i++) {
+        std::vector<Job> K = jobs;
+        int j = 0;
+        while (j < K.size() && jobs[i].deadline < K[j].deadline)
+            j++;
 
-    std::vector<std::pair<int, int>> jobs;
-    for (int i = 0; i < n; i++) {
-        jobs.push_back(std::make_pair(deadline[i], profit[i]));
+        K.insert(K.begin() + j, jobs[i]);
+
+        if (isFeasible(J, K)) {
+            J.clear();
+            for (const Job& job : K) {
+                J.push_back(job.index);
+            }
+        }
     }
 
-    std::sort(jobs.begin(), jobs.end(), [](const std::pair<int, int>& a, const std::pair<int, int>& b) {
-        return a.first > b.first;
+    return J;
+}
+
+int main() {
+    int n = 5;
+    std::vector<Job> jobs;
+    std::vector<int> J;
+
+    jobs.push_back(Job(2, 40, 1));
+    jobs.push_back(Job(4, 15, 2));
+    jobs.push_back(Job(3, 15, 3));
+    jobs.push_back(Job(2, 20, 4));
+    jobs.push_back(Job(3, 10, 5));
+
+    std::sort(jobs.begin(), jobs.end(), [](const Job& a, const Job& b) {
+        return a.deadline > b.deadline;
         });
 
-    for (const auto& job : jobs) {
-        sortedDeadlines.push_back(job.first);
+    J = schedule(n, jobs);
+
+    if (isFeasible(J, jobs)) {
+        std::cout << "Optimal Schedule J: ";
+        for (int job : J) {
+            std::cout << job << " ";
+        }
+        std::cout << std::endl;
+    }
+    else {
+        std::cout << "The schedule is not feasible." << std::endl;
     }
 
-    // Pass the sorted deadlines to the schedule function
-    schedule(n, sortedDeadlines, J);
-
-
-	cout << "Hello CMake." << endl;
-	return 0;
+    return 0;
 }

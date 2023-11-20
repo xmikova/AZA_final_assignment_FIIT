@@ -175,7 +175,6 @@ int main() {
     jobs.push_back(Job(1, 20, 5));
 
 
-
     std::sort(jobs.begin(), jobs.end(), [](const Job& a, const Job& b) {
         return a.profit > b.profit;
     });

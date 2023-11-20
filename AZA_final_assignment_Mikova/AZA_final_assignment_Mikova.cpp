@@ -19,14 +19,13 @@ struct DisjointSet
     int depth;
 
     // Constructor
-    DisjointSet(int n) //makeset
+    void makeset(int n)
     {
-        parent = new int[n+1];
+        parent = new int[n + 1];
 
         // Every node is a parent of itself
         for (int i = 0; i <= n; i++)
             parent[i] = i;
-
     }
 
     // Path Compression
@@ -126,7 +125,8 @@ std::vector<std::vector<int>> scheduleDisjoint(const std::vector<Job> &jobs, int
     // create a disjoint set data structure with
     // maxDeadline disjoint sets initially.
     int maxDeadline = findMaxDeadline(jobs, n);
-    DisjointSet ds(maxDeadline);
+    DisjointSet ds;
+    ds.makeset(findMaxDeadline(jobs, n));
 
     std::vector<std::vector<int>> result;
 

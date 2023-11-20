@@ -206,6 +206,7 @@ int main() {
     } else {
         std::cout << "No optimal schedule found." << std::endl;
     }
+
     return 0;
 }
 

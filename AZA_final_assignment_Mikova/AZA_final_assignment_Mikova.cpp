@@ -167,7 +167,6 @@ int main() {
     jobs.push_back(Job(1, 55, 7));
     */
 
-
     jobs.push_back(Job(3, 40, 1));
     jobs.push_back(Job(1, 35, 2));
     jobs.push_back(Job(1, 30, 3));

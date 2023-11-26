@@ -16,9 +16,7 @@ public:
 struct DisjointSet
 {
     int *parent;
-    int depth;
 
-    // Constructor
     void makeset(int n)
     {
         parent = new int[n + 1];
@@ -45,15 +43,12 @@ struct DisjointSet
             parent[current] = root;
             current = next;
         }
-
         return root;
     }
 
     // Makes u as parent of v.
     void merge(int u, int v)
     {
-        //update the greatest available
-        //free slot to u
         parent[v] = u;
     }
 };
@@ -115,43 +110,97 @@ int small(DisjointSet ds,int setContainingMinDeadline)
 
 bool sortByDeadline(const std::vector<int> &a, const std::vector<int> &b)
 {
-    // Compare the deadlines of two jobs for sorting
     return a[0] < b[0];
 }
 
 std::vector<std::vector<int>> scheduleDisjoint(const std::vector<Job> &jobs, int n)
 {
-    // Find the maximum deadline among all jobs and
-    // create a disjoint set data structure with
-    // maxDeadline disjoint sets initially.
-    int maxDeadline = findMaxDeadline(jobs, n);
     DisjointSet ds;
     ds.makeset(findMaxDeadline(jobs, n));
-
     std::vector<std::vector<int>> result;
 
-    // Traverse through all the jobs
     for (const Job &job : jobs)
     {
-        // Find the set S containing the minimum of its deadline and n
+        // Najdenie setu S ktory obsahuje minimum(deadline,n)
         int setContainingMinDeadline = std::min(ds.find(job.deadline), static_cast<int>(jobs.size()));
 
-        // If smallest member of set S is 0, reject the job
+        // Zavolame funkciu small(S) a ked je result 0 tak neschedulujem job
         if (small(ds, setContainingMinDeadline) == 0)
             continue;
 
-        // Store the information in the result vector
+        // Ulozim si vysledok ktory budem potom vo vysledku parsovat
         std::vector<int> jobInfo;
         jobInfo.push_back(small(ds, setContainingMinDeadline));
         jobInfo.push_back(job.index);
         result.push_back(jobInfo);
 
-        // Merge S with the set containing small(S)−1
+        // Set S mergujeme so setom ktory obsahuje small(S) - 1
         ds.merge(ds.find(setContainingMinDeadline - 1), setContainingMinDeadline);
     }
 
     return result;
 }
+
+vector<int> assignmentGreedy(const vector<vector<int>>& matrix) {
+    int n = matrix.size();
+    vector<int> assignment(n, -1);
+    vector<bool> assignedJob(n, false);
+
+    for (int i = 0; i < n; ++i) {
+        int minCost = INT_MAX;
+        int assignedJobIndex = -1;
+
+        for (int j = 0; j < n; ++j) {
+            if (matrix[i][j] < minCost && !assignedJob[j]) {
+                minCost = matrix[i][j];
+                assignedJobIndex = j;
+            }
+        }
+
+        assignment[i] = assignedJobIndex;
+        assignedJob[assignedJobIndex] = true;
+    }
+
+    return assignment;
+}
+
+vector<int> assignmentDynamic(const vector<vector<int>>& matrix) {
+    int n = matrix.size();    // Number of persons
+    int m = matrix[0].size(); // Number of jobs
+
+    vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
+
+    for (int i = 1; i <= n; ++i) {
+        for (int j = 1; j <= m; ++j) {
+            dp[i][j] = INT_MAX; // Initialize with a large value
+            for (int k = 1; k <= i; ++k) {
+                dp[i][j] = min(dp[i][j], matrix[k - 1][j - 1] + dp[i - k][j - 1]);
+            }
+        }
+    }
+
+    vector<bool> assignedJob(m, false);
+    vector<int> assignments;
+    int remainingWorkers = n;
+
+    for (int j = m; j > 0; j--) {
+        int bestAssignment = -1;
+        for (int k = 0; k < m; k++) {
+            if (!assignedJob[k] && (bestAssignment == -1 || dp[remainingWorkers][j] == matrix[k][j - 1] + dp[remainingWorkers - k - 1][j - 1])) {
+                bestAssignment = k;
+            }
+        }
+
+        if (bestAssignment != -1) {
+            assignedJob[bestAssignment] = true;
+            assignments.push_back(bestAssignment);
+            remainingWorkers--;
+        }
+    }
+
+    return assignments;
+}
+
 
 int main() {
     std::vector<Job> jobs;
@@ -173,6 +222,11 @@ int main() {
     jobs.push_back(Job(3, 25, 4));
     jobs.push_back(Job(1, 20, 5));
 
+    vector<vector<int>> matrix = {
+            {10, 5, 5},
+            {2, 4, 10},
+            {5, 1, 7}
+    };
 
     std::sort(jobs.begin(), jobs.end(), [](const Job& a, const Job& b) {
         return a.profit > b.profit;
@@ -182,7 +236,7 @@ int main() {
     std::vector<int> optimalSchedule = schedule(jobs);
 
     if (!optimalSchedule.empty()) {
-        std::cout << "Optimal Schedule J: ";
+        std::cout << "Optimal Schedule: ";
         for (int job : optimalSchedule) {
             std::cout << job << " ";
         }
@@ -191,11 +245,13 @@ int main() {
         std::cout << "No optimal schedule found." << std::endl;
     }
 
+    std::cout << std::endl;
+
     std::vector<std::vector<int>> optimalSchedule2 = scheduleDisjoint(jobs,n);
     std::sort(optimalSchedule2.begin(), optimalSchedule2.end(), sortByDeadline);
 
     if (!optimalSchedule2.empty()) {
-        std::cout << "Optimal Schedule J (disjoint set approach): ";
+        std::cout << "Optimal Schedule (disjoint set approach): ";
         for (const std::vector<int> &info : optimalSchedule2)
         {
             std::cout << info[1] << " ";
@@ -205,6 +261,29 @@ int main() {
         std::cout << "No optimal schedule found." << std::endl;
     }
 
+    std::cout << std::endl;
+
+    vector<int> result = assignmentGreedy(matrix);
+
+    cout << "Assigned Jobs (greedy approach):\n";
+    int totalCostGreeedy = 0;
+    for (int i = 0; i < result.size(); ++i) {
+        cout << "Person " << i + 1 << " assigned to job " << result[i] + 1 << " with cost " << matrix[i][result[i]] << "\n";
+        totalCostGreeedy += matrix[i][result[i]];
+    }
+
+    cout << "Total Cost: " << totalCostGreeedy << endl;
+
+
+    vector<int> assignments = assignmentDynamic(matrix);
+
+    int totalCostDynamic = 0;
+    for (int i = 0; i < assignments.size(); ++i) {
+        cout << "Person " << i + 1 << " assigned to Job " << assignments[i] + 1 << " with cost " << matrix[i][assignments[i]] << "\n";
+        totalCostDynamic += matrix[i][assignments[i]];
+    }
+
+    cout << "Total Cost: " << totalCostDynamic << endl;
+
     return 0;
 }
-

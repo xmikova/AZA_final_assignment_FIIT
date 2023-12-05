@@ -34,7 +34,7 @@ vector<int> assignmentGreedy(const vector<vector<int>>& matrix) {
     return assignment;
 }
 
-/*
+
 int main() {
     vector<vector<int>> matrix = {
             {10, 5, 5},
@@ -45,13 +45,12 @@ int main() {
     vector<int> result = assignmentGreedy(matrix);
 
     cout << "Assigned Jobs (greedy approach):\n";
-    int totalCostGreeedy = 0;
+    int totalCostGreedy = 0;
     for (int i = 0; i < result.size(); ++i) {
         cout << "Person " << i + 1 << " assigned to job " << result[i] + 1 << " with cost " << matrix[i][result[i]]
              << "\n";
-        totalCostGreeedy += matrix[i][result[i]];
+        totalCostGreedy += matrix[i][result[i]];
     }
 
-    cout << "Total Cost: " << totalCostGreeedy << endl;
+    cout << "Total Cost: " << totalCostGreedy << endl;
 }
-*/

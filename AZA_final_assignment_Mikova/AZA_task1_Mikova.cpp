@@ -70,15 +70,17 @@ vector<int> schedule(const vector<Job>& sortedJobs) {
     return jobSet;
 }
 
-/*
+
 int main() {
     std::vector <Job> jobs;
 
-    jobs.push_back(Job(3, 40, 1));
-    jobs.push_back(Job(1, 35, 2));
-    jobs.push_back(Job(1, 30, 3));
-    jobs.push_back(Job(3, 25, 4));
-    jobs.push_back(Job(1, 20, 5));
+    jobs.push_back(Job(2, 40, 1));
+    jobs.push_back(Job(4, 15, 2));
+    jobs.push_back(Job(3, 60, 3));
+    jobs.push_back(Job(2, 20, 4));
+    jobs.push_back(Job(3, 10, 5));
+    jobs.push_back(Job(1, 45, 6));
+    jobs.push_back(Job(1, 55, 7));
 
 
     std::sort(jobs.begin(), jobs.end(), [](const Job &a, const Job &b) {
@@ -99,4 +101,3 @@ int main() {
 
     return 0;
 }
-*/

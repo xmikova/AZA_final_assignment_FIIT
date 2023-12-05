@@ -4,7 +4,7 @@
 
 using namespace std;
 
-//Trieda Job, ktorá udržiava infomráciu o indexe, deadline, a profite každého jobu.
+//Trieda Job, ktorá udržiava informáciu o indexe, deadline, a profite každého jobu.
 class Job {
 public:
     int deadline;
@@ -98,16 +98,22 @@ std::vector<std::vector<int>> scheduleDisjoint(const std::vector<Job> &jobs, int
     return result;
 }
 
-/*
+
 int main() {
     std::vector<Job> jobs;
     int n = static_cast<int>(jobs.size());
 
-    jobs.push_back(Job(3, 40, 1));
-    jobs.push_back(Job(1, 35, 2));
-    jobs.push_back(Job(1, 30, 3));
-    jobs.push_back(Job(3, 25, 4));
-    jobs.push_back(Job(1, 20, 5));
+    jobs.push_back(Job(2, 40, 1));
+    jobs.push_back(Job(4, 15, 2));
+    jobs.push_back(Job(3, 60, 3));
+    jobs.push_back(Job(2, 20, 4));
+    jobs.push_back(Job(3, 10, 5));
+    jobs.push_back(Job(1, 45, 6));
+    jobs.push_back(Job(1, 55, 7));
+
+    std::sort(jobs.begin(), jobs.end(), [](const Job &a, const Job &b) {
+        return a.profit > b.profit;
+    });
 
     std::vector<std::vector<int>> optimalSchedule2 = scheduleDisjoint(jobs, n);
     std::sort(optimalSchedule2.begin(), optimalSchedule2.end(), [](std::vector<int> &a, const std::vector<int> &b) {
@@ -124,4 +130,3 @@ int main() {
         std::cout << "No optimal schedule found." << std::endl;
     }
 }
-*/
